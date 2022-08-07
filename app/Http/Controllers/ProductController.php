@@ -9,13 +9,15 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EmployeeExport;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+
 //use Excel;
 class ProductController extends Controller
 {
     public function index()
     {
         $products = Product::all();
-        $response['data'] = $products;
+        $response= $products;
 
         return response()->json($response,200) ;
 
@@ -25,12 +27,11 @@ class ProductController extends Controller
     {
         $products = Product::where('id', $id)->first();
         if(isset($products)){
-            $response['data'] = $products;
-            $response['message'] = "success";
-            $response['status_code'] = 200;
+            $response = $products;
+
             return response()->json($response,200) ;
         }
-        $response['data'] = $products;
+        $response = $products;
 
         return response()->json($response,404) ;
     }
@@ -56,7 +57,7 @@ class ProductController extends Controller
         $product->user_id = $request->user_id;
         $product->save();
 
-        $response['data'] = $product;
+        $response= $product;
 
         return response()->json($response,200) ;
         }
@@ -82,12 +83,11 @@ class ProductController extends Controller
            //    ////////////////////////////////////
 
             $product->save();
-            $response['data'] = $product;
-            $response['message'] = "product updated successfully";
-            $response['status_code'] = 200;
+            $response= $product;
+
             return response()->json($response,200) ;
             }
-            $response['data'] = '';
+            $response = '';
 
             return response()->json($response,404) ;
         }
@@ -139,11 +139,8 @@ class ProductController extends Controller
                 
      
             }
-            $response['data'] = $product;
-            $response['location'] = $location_cl;
-            $response['state'] = $state_cl;
-            $response['message'] = "error";
-            $response['status_code'] = 404;
+            $response = $product;
+
             return response()->json($response,404) ;
         }
     public function show_by_category($id)
@@ -151,13 +148,13 @@ class ProductController extends Controller
      $products=Product::select('id','name','image')->where('category_id',$id)->get();
      if(isset($products))
      {
-       $response['data']=$products;
+       $response=$products;
 
        return response()->json($response,200);
      }
      else if (!isset($products))
      {
-       $response['data']=$products;
+       $response=$products;
 
        return response()->json($response,404);
      }
@@ -196,21 +193,15 @@ class ProductController extends Controller
         ->get(array(DB::raw('products.*')));
         if(isset($products))
      {
-       $response['data']=$products;
+       $response=$products;
 
        return response()->json($response,200);
      }
     }
-
     public function Export_into_exel()
     {  
          $id=5;
-        // $item=array();
-        // $detail=array();
-       //  $product=array();
-        // $products = Order::join("order_details", "order_details.product_id", "=","products.id")
-        // ->join("orders","orders.id", "=","order_details.order_id") ->where('product_id',$id)
-        //->join("orders","orders.id", "=","order_details.order_id")
+
         $order_d=Order_detail::where('product_id',$id)->get();
         foreach ($order_d as $o)
           {$item=Order::where('id',$o->order_id)->get();
@@ -220,10 +211,19 @@ class ProductController extends Controller
           foreach ($detail as $o2)
           $product[]=Product::where('id',$o2->product_id)->where('id','!=',$id)->get();}}
        //return $product;
-
-       return Excel::download(new EmployeeExport(5),'product.csv');
-
-
+      // return Excel::store( new EmployeeExport(5), 'Super.csv', 'export' );
+       return Excel::download(new EmployeeExport(5),'/New folder/Downloads/product.csv');
+      
+       //return Http::get('http://127.0.0.1:7000/sugg_recm/')['summer_Sweat'];
     }
+
+    public function http()
+    {
+      $this->Export_into_exel();
+      $id='summer_Sweat';
+      return Http::asForm()->get('http://127.0.0.1:7000/sugg_recm/summer_Sweat');
+    }
+   
+
 
 }

@@ -28,6 +28,23 @@ return [
 
     'cloud' => env('FILESYSTEM_CLOUD', 's3'),
 
+
+    'real_public' => [
+        'driver' => 'local',
+        'root' => public_path(),
+        'url' => env('APP_URL'),
+        'visibility' => 'public',
+    ],
+
+    'disks' => [
+        // your other disks here, leave them as they are, and add this one
+    
+        'export' => [
+            'driver' => 'local',
+            'root' => storage_path('app/export'),
+        ],
+    
+    ],
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

@@ -20,8 +20,6 @@ class CreateCompaniesTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->bigInteger('phone')->nullable();
-            $table->bigInteger('product_id')->unsigned();
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
