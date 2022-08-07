@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Product;
 use App\Stock;
+use App\Order_detail;
+use App\Order;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EmployeeExport;
@@ -14,8 +16,7 @@ class ProductController extends Controller
     {
         $products = Product::all();
         $response['data'] = $products;
-        $response['message'] = "This is all products";
-        $response['status_code'] = 200;
+
         return response()->json($response,200) ;
 
     }
@@ -30,8 +31,7 @@ class ProductController extends Controller
             return response()->json($response,200) ;
         }
         $response['data'] = $products;
-        $response['message'] = "erorr not found";
-        $response['status_code'] = 404;
+
         return response()->json($response,404) ;
     }
 
@@ -57,8 +57,7 @@ class ProductController extends Controller
         $product->save();
 
         $response['data'] = $product;
-        $response['message'] = "product created successfully";
-        $response['status_code'] = 200;
+
         return response()->json($response,200) ;
         }
 
@@ -89,8 +88,7 @@ class ProductController extends Controller
             return response()->json($response,200) ;
             }
             $response['data'] = '';
-            $response['message'] = "erorr not found";
-            $response['status_code'] = 404;
+
             return response()->json($response,404) ;
         }
 
@@ -104,28 +102,63 @@ class ProductController extends Controller
             return response()->json($response,200) ;
             }
             $response['data'] = '';
-            $response['message'] = "erorr not found";
-            $response['status_code'] = 404;
+
             return response()->json($response,404) ;
 
         }
 
-
+        public function show_products_by_color_size_price(Request $request)
+        {
+            if (isset($request->color)&&isset($request->size)&&isset($request->sell_price)) {
+                 $product = Product::all()->where('color','=', $request->color)->where('size','=', $request->size)->where('sell_price','=', $request->sell_price);
+            }
+            else if (isset($request->color)&&isset($request->size)){
+                  $product = Product::all()->where('color','=', $request->color)->where('size','=', $request->size);
+            }
+            else if (isset($request->sell_price)&&isset($request->color)) {
+                 $product = Product::all()->where('sell_price','=', $request->sell_price)->where('color','=', $request->color);
+            }
+            else if (isset($request->size)&&isset($request->sell_price)) {
+                 $product = Product::all()->where('size','=', $request->size)->where('sell_price','=', $request->sell_price);
+            }
+            else if (isset($request->color)) {
+                 $product = Product::all()->where('color','=', $request->color);
+            }
+            else if (isset($request->size)) {
+                 $product = Product::all()->where('size','=', $request->size);
+            }
+            else if (isset($request->sell_price)) {
+                 $product = Product::all()->where('sell_price','=', $request->sell_price);
+            }
+            
+            if(isset($product)){
+                $response['data'] = $product;
+                $response['message'] = "search success";
+                $response['status_code'] = 200;
+                return response()->json($response,200) ;
+                
+     
+            }
+            $response['data'] = $product;
+            $response['location'] = $location_cl;
+            $response['state'] = $state_cl;
+            $response['message'] = "error";
+            $response['status_code'] = 404;
+            return response()->json($response,404) ;
+        }
     public function show_by_category($id)
     {
      $products=Product::select('id','name','image')->where('category_id',$id)->get();
      if(isset($products))
      {
        $response['data']=$products;
-       $response['message']="success";
-       $response['status_code']=200;
+
        return response()->json($response,200);
      }
      else if (!isset($products))
      {
        $response['data']=$products;
-       $response['message']="error not found";
-       $response['status_code']=404;
+
        return response()->json($response,404);
      }
     }
@@ -164,16 +197,33 @@ class ProductController extends Controller
         if(isset($products))
      {
        $response['data']=$products;
-       $response['message']="success";
-       $response['status_code']=200;
+
        return response()->json($response,200);
      }
-
-
     }
+
     public function Export_into_exel()
-    {
-        return Excel::download(new EmployeeExport,'product.csv');
+    {  
+         $id=5;
+        // $item=array();
+        // $detail=array();
+       //  $product=array();
+        // $products = Order::join("order_details", "order_details.product_id", "=","products.id")
+        // ->join("orders","orders.id", "=","order_details.order_id") ->where('product_id',$id)
+        //->join("orders","orders.id", "=","order_details.order_id")
+        $order_d=Order_detail::where('product_id',$id)->get();
+        foreach ($order_d as $o)
+          {$item=Order::where('id',$o->order_id)->get();
+        foreach ($item as $o1)
+        {
+         $detail=Order_detail::where('order_id',$o1->id)->get();
+          foreach ($detail as $o2)
+          $product[]=Product::where('id',$o2->product_id)->where('id','!=',$id)->get();}}
+       //return $product;
+
+       return Excel::download(new EmployeeExport(5),'product.csv');
+
+
     }
 
 }

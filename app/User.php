@@ -56,5 +56,19 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function location()
+    {
+        return $this->belongsTo('App\Location', 'location_id');
+    }
+    public function products()
+    {
+        return $this->hasMany('App\Product','user_id');
+    }
+
+     public function orders()
+    {
+        return $this->hasMany('App\Order','user_id');
+    }
 }
 

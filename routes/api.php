@@ -36,6 +36,7 @@ Route::post('/categories/delete/{id}','CategoryController@delete');
 Route::get('/products/in_category/{id}','ProductController@show_by_category');
 Route::post('/products/date/','ProductController@show_by_date');
 Route::get('/product/csv/','ProductController@Export_into_exel');
+Route::post('product1/csv/{id}','EmployeeExport@collection');
 Route::get('/detail/csv/','OrderController@Export_into_exel');
 Route::get('/order/csv/','Order_detailController@Export_into_exel');
 

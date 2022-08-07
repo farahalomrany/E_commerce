@@ -28,6 +28,9 @@ class CreateProductsTable extends Migration
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade')->nullable();
             // $table->bigInteger('user_id')->unsigned();
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->integer('vote_count')->nullable();
+            $table->integer('vote_average')->nullable();
+            $table->integer('popularity')->nullable();
             $table->timestamps();
         });
     }
